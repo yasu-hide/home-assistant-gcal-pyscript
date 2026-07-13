@@ -13,11 +13,11 @@
       response_variable: gcal_announcement
     - action: tts.speak
       target:
-        entity_id: tts.google_translate_ja_co_jp
+        entity_id: tts.google_cloud
       data:
         media_player_entity_id: media_player.example_speaker
         message: "{{ gcal_announcement.message }}"
-        language: ja
+        language: ja-JP
   mode: single
 
 - id: gcal_announcement_dayoff
@@ -35,9 +35,9 @@
       response_variable: gcal_announcement
     - action: tts.speak
       target:
-        entity_id: tts.google_translate_ja_co_jp
+        entity_id: tts.google_cloud
       data:
         media_player_entity_id: media_player.example_speaker
         message: "{{ gcal_announcement.message }}"
-        language: ja
+        language: ja-JP
   mode: single
