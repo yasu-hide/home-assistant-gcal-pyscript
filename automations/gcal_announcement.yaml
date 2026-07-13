@@ -12,8 +12,8 @@
     - action: pyscript.build_daily_announcement
       data:
         accounts: &gcal_accounts
-          息子: calendar.example_son
-          娘: calendar.example_daughter
+          息子くん: calendar.example_son
+          娘さん: calendar.example_daughter
           ママ: calendar.example_mother
           パパ: calendar.example_father
           家族: calendar.example_family
