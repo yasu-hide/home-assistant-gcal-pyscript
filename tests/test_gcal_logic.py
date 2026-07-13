@@ -1,5 +1,6 @@
 from datetime import datetime
 from pyscript.modules.gcal_logic import greeting, format_hhmm, format_announcement
+from pyscript.modules.gcal_logic import normalize_event, fetch_events, is_total_failure
 
 
 def test_greeting_morning():
@@ -77,3 +78,91 @@ def test_format_announcement_fetch_failed_overrides_events():
     now = datetime(2026, 7, 13, 8, 30)
     result = format_announcement([], now, fetch_failed=True)
     assert result == "　おはようございます。08時30分になりました。今日の予定は、予定の取得に失敗しました。"
+
+
+def test_normalize_event_timed():
+    raw = {
+        "start": {"dateTime": "2026-07-13T18:55:00+09:00"},
+        "end": {"dateTime": "2026-07-13T21:10:00+09:00"},
+        "summary": "塾",
+    }
+    result = normalize_event("息子", raw)
+    assert result == {
+        "account_name": "息子",
+        "summary": "塾",
+        "start": datetime(2026, 7, 13, 18, 55, tzinfo=result["start"].tzinfo),
+        "all_day": False,
+    }
+
+
+def test_normalize_event_all_day():
+    raw = {
+        "start": {"date": "2026-07-14"},
+        "end": {"date": "2026-07-15"},
+        "summary": "バイト　書類提出",
+    }
+    result = normalize_event("娘", raw)
+    assert result == {
+        "account_name": "娘",
+        "summary": "バイト　書類提出",
+        "start": datetime(2026, 7, 14),
+        "all_day": True,
+    }
+
+
+def test_normalize_event_empty_title_becomes_yotei():
+    raw = {"start": {"dateTime": "2026-07-13T09:00:00+09:00"}, "summary": ""}
+    result = normalize_event("息子", raw)
+    assert result["summary"] == "予定"
+
+
+def test_fetch_events_success():
+    accounts = {"息子": "calendar.example_son", "娘": "calendar.example_daughter"}
+
+    def fake_get_events(entity_id, start, end):
+        if entity_id == "calendar.example_son":
+            return [{"start": {"dateTime": "2026-07-13T18:55:00+09:00"}, "summary": "塾"}]
+        return []
+
+    events, skipped = fetch_events(accounts, datetime(2026, 7, 13), datetime(2026, 7, 14), fake_get_events)
+    assert skipped == []
+    assert len(events) == 1
+    assert events[0]["account_name"] == "息子"
+    assert events[0]["summary"] == "塾"
+
+
+def test_fetch_events_skips_failing_account_and_continues():
+    accounts = {"息子": "calendar.example_son", "パパ": "calendar.example_father"}
+
+    def fake_get_events(entity_id, start, end):
+        if entity_id == "calendar.example_son":
+            raise RuntimeError("entity not loaded")
+        return [{"start": {"dateTime": "2026-07-13T20:00:00+09:00"}, "summary": "会議"}]
+
+    events, skipped = fetch_events(accounts, datetime(2026, 7, 13), datetime(2026, 7, 14), fake_get_events)
+    assert skipped == ["息子"]
+    assert len(events) == 1
+    assert events[0]["account_name"] == "パパ"
+
+
+def test_fetch_events_all_accounts_fail():
+    accounts = {"息子": "calendar.example_son", "パパ": "calendar.example_father"}
+
+    def fake_get_events(entity_id, start, end):
+        raise RuntimeError("auth expired")
+
+    events, skipped = fetch_events(accounts, datetime(2026, 7, 13), datetime(2026, 7, 14), fake_get_events)
+    assert events == []
+    assert set(skipped) == {"息子", "パパ"}
+
+
+def test_is_total_failure_true_when_all_skipped_and_no_events():
+    assert is_total_failure({"息子", "パパ"}, ["息子", "パパ"], []) is True
+
+
+def test_is_total_failure_false_when_partial_skip():
+    assert is_total_failure({"息子", "パパ"}, ["息子"], [{"account_name": "パパ"}]) is False
+
+
+def test_is_total_failure_false_when_no_skip():
+    assert is_total_failure({"息子", "パパ"}, [], []) is False

@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 def greeting(hour: int) -> str:
     if 4 <= hour < 12:
         return "おはようございます。"
@@ -32,3 +35,37 @@ def format_announcement(events: list[dict], now, fetch_failed: bool = False) -> 
     else:
         tail = "、".join(_group_and_sort(events)) + "です。"
     return header + "今日の予定は、" + tail
+
+
+def normalize_event(account_name: str, raw: dict) -> dict:
+    start = raw["start"]
+    if "date" in start:
+        all_day = True
+        start_dt = datetime.fromisoformat(start["date"])
+    else:
+        all_day = False
+        start_dt = datetime.fromisoformat(start["dateTime"])
+    summary = raw.get("summary") or "予定"
+    return {
+        "account_name": account_name,
+        "summary": summary,
+        "start": start_dt,
+        "all_day": all_day,
+    }
+
+
+def fetch_events(accounts: dict, start, end, get_events_fn) -> tuple:
+    events = []
+    skipped = []
+    for name, entity_id in accounts.items():
+        try:
+            raw_events = get_events_fn(entity_id, start, end)
+        except Exception:
+            skipped.append(name)
+            continue
+        events.extend(normalize_event(name, raw) for raw in raw_events)
+    return events, skipped
+
+
+def is_total_failure(target_account_names: set, skipped_accounts: list, events: list) -> bool:
+    return not events and set(skipped_accounts) == set(target_account_names)
