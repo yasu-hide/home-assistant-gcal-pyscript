@@ -1,6 +1,6 @@
 - id: gcal_announcement_weekday
   alias: 予定読み上げ(平日)
-  description: 平日朝、その日の予定をGoogle Homeで読み上げる
+  description: 平日朝、その日の予定をスマートスピーカーで読み上げる
   triggers:
     - trigger: time
       at: "07:00:00"
@@ -29,7 +29,7 @@
 
 - id: gcal_announcement_dayoff
   alias: 予定読み上げ(休日)
-  description: 休日朝、その日の予定をGoogle Homeで読み上げる
+  description: 休日朝、その日の予定をスマートスピーカーで読み上げる
   triggers:
     - trigger: time
       at: "08:45:00"
