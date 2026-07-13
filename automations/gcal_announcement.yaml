@@ -10,14 +10,21 @@
       state: "on"
   actions:
     - action: pyscript.build_daily_announcement
+      data:
+        accounts: &gcal_accounts
+          息子: calendar.example_son
+          娘: calendar.example_daughter
+          ママ: calendar.example_mother
+          パパ: calendar.example_father
+          家族: calendar.example_family
       response_variable: gcal_announcement
     - action: tts.speak
       target:
-        entity_id: tts.google_translate_ja_co_jp
+        entity_id: tts.voicetext_tts
       data:
         media_player_entity_id: media_player.example_speaker
         message: "{{ gcal_announcement.message }}"
-        language: ja
+        language: ja-JP
   mode: single
 
 - id: gcal_announcement_dayoff
@@ -32,12 +39,14 @@
       state: "off"
   actions:
     - action: pyscript.build_daily_announcement
+      data:
+        accounts: *gcal_accounts
       response_variable: gcal_announcement
     - action: tts.speak
       target:
-        entity_id: tts.google_translate_ja_co_jp
+        entity_id: tts.voicetext_tts
       data:
         media_player_entity_id: media_player.example_speaker
         message: "{{ gcal_announcement.message }}"
-        language: ja
+        language: ja-JP
   mode: single

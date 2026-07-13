@@ -2,14 +2,6 @@ from datetime import datetime
 
 import gcal_logic
 
-ACCOUNTS = {
-    "息子": "calendar.example_son",
-    "娘": "calendar.example_daughter",
-    "ママ": "calendar.example_mother",
-    "パパ": "calendar.example_father",
-    "家族": "calendar.example_family",
-}
-
 
 def _get_events_for_account(entity_id, start, end):
     # NOTE: return_response=Trueで返るレスポンスの実際のキー構造
@@ -32,10 +24,10 @@ def _today_range():
 
 
 @service(supports_response="only")
-def fetch_events():
+def fetch_events(accounts):
     _, start, end = _today_range()
     events, skipped_accounts = gcal_logic.fetch_events(
-        ACCOUNTS, start, end, _get_events_for_account
+        accounts, start, end, _get_events_for_account
     )
     return {"events": events, "skipped_accounts": skipped_accounts}
 
@@ -49,13 +41,13 @@ def notify_on_failure(skipped_accounts=None):
 
 
 @service(supports_response="only")
-def build_daily_announcement():
+def build_daily_announcement(accounts):
     now, start, end = _today_range()
     events, skipped_accounts = gcal_logic.fetch_events(
-        ACCOUNTS, start, end, _get_events_for_account
+        accounts, start, end, _get_events_for_account
     )
     if skipped_accounts:
         notify_on_failure(skipped_accounts=skipped_accounts)
-    fetch_failed = gcal_logic.is_total_failure(set(ACCOUNTS.keys()), skipped_accounts, events)
+    fetch_failed = gcal_logic.is_total_failure(set(accounts.keys()), skipped_accounts, events)
     message = gcal_logic.format_announcement(events, now, fetch_failed=fetch_failed)
     return {"message": message}
