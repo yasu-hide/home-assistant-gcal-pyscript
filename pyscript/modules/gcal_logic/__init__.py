@@ -63,7 +63,7 @@ def fetch_events(accounts: dict, start, end, get_events_fn) -> tuple:
         except Exception:
             skipped.append(name)
             continue
-        events.extend(normalize_event(name, raw) for raw in raw_events)
+        events.extend([normalize_event(name, raw) for raw in raw_events])
     return events, skipped
 
 
