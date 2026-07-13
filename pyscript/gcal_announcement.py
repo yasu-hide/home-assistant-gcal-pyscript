@@ -7,6 +7,7 @@ ACCOUNTS = {
     "娘": "calendar.example_daughter",
     "ママ": "calendar.example_mother",
     "パパ": "calendar.example_father",
+    "家族": "calendar.example_family",
 }
 
 
