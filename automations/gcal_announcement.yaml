@@ -3,7 +3,7 @@
   description: 平日朝、その日の予定をGoogle Homeで読み上げる
   triggers:
     - trigger: time
-      at: "06:45:00"
+      at: "07:00:00"
   conditions:
     - condition: state
       entity_id: binary_sensor.workday_sensor_jp
@@ -25,7 +25,7 @@
   description: 休日朝、その日の予定をGoogle Homeで読み上げる
   triggers:
     - trigger: time
-      at: "08:30:00"
+      at: "08:45:00"
   conditions:
     - condition: state
       entity_id: binary_sensor.workday_sensor_jp
