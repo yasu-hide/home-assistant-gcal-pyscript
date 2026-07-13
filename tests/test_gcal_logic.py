@@ -1,6 +1,7 @@
 from datetime import datetime
 from pyscript.modules.gcal_logic import greeting, format_hhmm, format_announcement
 from pyscript.modules.gcal_logic import normalize_event, fetch_events, is_total_failure
+from pyscript.modules.gcal_logic import build_failure_notification
 
 
 def test_greeting_morning():
@@ -166,3 +167,14 @@ def test_is_total_failure_false_when_partial_skip():
 
 def test_is_total_failure_false_when_no_skip():
     assert is_total_failure({"息子", "パパ"}, [], []) is False
+
+
+def test_build_failure_notification_single_account():
+    title, message = build_failure_notification(["息子"])
+    assert title == "カレンダー取得エラー"
+    assert message == "以下のアカウントの予定取得に失敗しました: 息子"
+
+
+def test_build_failure_notification_multiple_accounts():
+    title, message = build_failure_notification(["息子", "パパ"])
+    assert message == "以下のアカウントの予定取得に失敗しました: 息子、パパ"

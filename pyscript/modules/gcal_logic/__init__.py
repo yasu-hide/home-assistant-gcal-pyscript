@@ -69,3 +69,9 @@ def fetch_events(accounts: dict, start, end, get_events_fn) -> tuple:
 
 def is_total_failure(target_account_names: set, skipped_accounts: list, events: list) -> bool:
     return not events and set(skipped_accounts) == set(target_account_names)
+
+
+def build_failure_notification(skipped_accounts: list) -> tuple:
+    title = "カレンダー取得エラー"
+    message = "以下のアカウントの予定取得に失敗しました: " + "、".join(skipped_accounts)
+    return title, message
