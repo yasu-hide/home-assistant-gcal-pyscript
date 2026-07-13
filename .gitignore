@@ -1,4 +1,8 @@
 __pycache__/
 .pytest_cache/
-.claude/worktrees/
-.claude/settings.local.json
+.claude/
+.ha_token
+automations/gcal_announcement.yaml
+DESIGN.md
+CLAUDE.md
+docs/
