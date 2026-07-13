@@ -1,0 +1,43 @@
+- id: gcal_announcement_weekday
+  alias: 予定読み上げ(平日)
+  description: 平日朝、その日の予定をGoogle Homeで読み上げる
+  triggers:
+    - trigger: time
+      at: "06:45:00"
+  conditions:
+    - condition: state
+      entity_id: binary_sensor.workday_sensor_jp
+      state: "on"
+  actions:
+    - action: pyscript.build_daily_announcement
+      response_variable: gcal_announcement
+    - action: tts.speak
+      target:
+        entity_id: tts.google_translate_ja_co_jp
+      data:
+        media_player_entity_id: media_player.example_speaker
+        message: "{{ gcal_announcement.message }}"
+        language: ja
+  mode: single
+
+- id: gcal_announcement_dayoff
+  alias: 予定読み上げ(休日)
+  description: 休日朝、その日の予定をGoogle Homeで読み上げる
+  triggers:
+    - trigger: time
+      at: "08:30:00"
+  conditions:
+    - condition: state
+      entity_id: binary_sensor.workday_sensor_jp
+      state: "off"
+  actions:
+    - action: pyscript.build_daily_announcement
+      response_variable: gcal_announcement
+    - action: tts.speak
+      target:
+        entity_id: tts.google_translate_ja_co_jp
+      data:
+        media_player_entity_id: media_player.example_speaker
+        message: "{{ gcal_announcement.message }}"
+        language: ja
+  mode: single
