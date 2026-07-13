@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pyscript.modules import gcal_logic
+import gcal_logic
 
 ACCOUNTS = {
     "息子": "calendar.example_son",
@@ -11,13 +11,14 @@ ACCOUNTS = {
 
 
 def _get_events_for_account(entity_id, start, end):
-    # NOTE: pyscriptの calendar.get_events レスポンス形式(response_variable経由で
-    # 返る辞書のキー構造)を、実際にHACS導入後にログ出力して確認し、
-    # 下記のインデックス([entity_id]["events"]の部分)が正しいことを検証すること。
+    # NOTE: return_response=Trueで返るレスポンスの実際のキー構造
+    # ([entity_id]["events"]という想定が正しいか)を、実際にHACS導入後に
+    # ログ出力して確認し、検証すること。
     result = calendar.get_events(
         entity_id=entity_id,
         start_date_time=start.isoformat(),
         end_date_time=end.isoformat(),
+        return_response=True,
     )
     return result[entity_id]["events"]
 
@@ -29,7 +30,7 @@ def _today_range():
     return now, start, end
 
 
-@service
+@service(supports_response="only")
 def fetch_events():
     _, start, end = _today_range()
     events, skipped_accounts = gcal_logic.fetch_events(
