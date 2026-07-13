@@ -1,4 +1,4 @@
-# homeassistant-gcal-int
+# home-assistant-gcal-pyscript
 
 Home Assistant上でGoogleカレンダーの予定を毎朝スマートスピーカーで読み上げるための実装です。
 
