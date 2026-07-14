@@ -82,9 +82,10 @@ def test_format_announcement_fetch_failed_overrides_events():
 
 
 def test_normalize_event_timed():
+    # calendar.get_eventsの実レスポンスはstart/endがフラットなISO文字列
     raw = {
-        "start": {"dateTime": "2026-07-13T18:55:00+09:00"},
-        "end": {"dateTime": "2026-07-13T21:10:00+09:00"},
+        "start": "2026-07-13T18:55:00+09:00",
+        "end": "2026-07-13T21:10:00+09:00",
         "summary": "塾",
     }
     result = normalize_event("息子", raw)
@@ -98,8 +99,8 @@ def test_normalize_event_timed():
 
 def test_normalize_event_all_day():
     raw = {
-        "start": {"date": "2026-07-14"},
-        "end": {"date": "2026-07-15"},
+        "start": "2026-07-14",
+        "end": "2026-07-15",
         "summary": "バイト　書類提出",
     }
     result = normalize_event("娘", raw)
@@ -112,7 +113,7 @@ def test_normalize_event_all_day():
 
 
 def test_normalize_event_empty_title_becomes_yotei():
-    raw = {"start": {"dateTime": "2026-07-13T09:00:00+09:00"}, "summary": ""}
+    raw = {"start": "2026-07-13T09:00:00+09:00", "summary": ""}
     result = normalize_event("息子", raw)
     assert result["summary"] == "予定"
 
@@ -122,7 +123,7 @@ def test_fetch_events_success():
 
     def fake_get_events(entity_id, start, end):
         if entity_id == "calendar.example_son":
-            return [{"start": {"dateTime": "2026-07-13T18:55:00+09:00"}, "summary": "塾"}]
+            return [{"start": "2026-07-13T18:55:00+09:00", "summary": "塾"}]
         return []
 
     events, skipped = fetch_events(accounts, datetime(2026, 7, 13), datetime(2026, 7, 14), fake_get_events)
@@ -138,7 +139,7 @@ def test_fetch_events_skips_failing_account_and_continues():
     def fake_get_events(entity_id, start, end):
         if entity_id == "calendar.example_son":
             raise RuntimeError("entity not loaded")
-        return [{"start": {"dateTime": "2026-07-13T20:00:00+09:00"}, "summary": "会議"}]
+        return [{"start": "2026-07-13T20:00:00+09:00", "summary": "会議"}]
 
     events, skipped = fetch_events(accounts, datetime(2026, 7, 13), datetime(2026, 7, 14), fake_get_events)
     assert skipped == ["息子"]

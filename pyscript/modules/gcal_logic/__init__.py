@@ -38,13 +38,11 @@ def format_announcement(events: list[dict], now, fetch_failed: bool = False) -> 
 
 
 def normalize_event(account_name: str, raw: dict) -> dict:
+    # calendar.get_eventsのレスポンスはstart/endがフラットなISO文字列
+    # (終日イベントは時刻部分を持たない"YYYY-MM-DD")
     start = raw["start"]
-    if "date" in start:
-        all_day = True
-        start_dt = datetime.fromisoformat(start["date"])
-    else:
-        all_day = False
-        start_dt = datetime.fromisoformat(start["dateTime"])
+    all_day = "T" not in start
+    start_dt = datetime.fromisoformat(start)
     summary = raw.get("summary") or "予定"
     return {
         "account_name": account_name,
