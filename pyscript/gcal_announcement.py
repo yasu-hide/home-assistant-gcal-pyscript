@@ -4,9 +4,6 @@ import gcal_logic
 
 
 def _get_events_for_account(entity_id, start, end):
-    # NOTE: return_response=Trueで返るレスポンスの実際のキー構造
-    # ([entity_id]["events"]という想定が正しいか)を、実際にHACS導入後に
-    # ログ出力して確認し、検証すること。
     result = calendar.get_events(
         entity_id=entity_id,
         start_date_time=start.isoformat(),
